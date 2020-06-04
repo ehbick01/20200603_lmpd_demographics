@@ -185,6 +185,13 @@ lmpd_demographics_police <- lmpd_demographics %>%
     division,
     lmpd_ethnicity,
     lmpd_share
+  ) %>% 
+  group_by(
+    division,
+    lmpd_ethnicity
+  ) %>% 
+  summarise(
+    lmpd_share = sum(lmpd_share)
   )
 
 #### Clean up tract files
@@ -339,7 +346,7 @@ division_combined_demographics <- division_citizen_demographics %>%
   ) %>% 
   mutate(
     lmpd_relative_representation = lmpd_share - citizen_share,
-    division = factor(division, levels = c('FIRST DIVISION', 'SECOND DIVISION', 'THIRD DIVISION', 'FOURTH DIVISION', 'FIFTH DIVISION', 'SIX DIVISION', 'SEVENTH DIVISION', 'EIGHTH DIVISION')),
+    division = factor(division, levels = c('FIRST DIVISION', 'SECOND DIVISION', 'THIRD DIVISION', 'FOURTH DIVISION', 'FIFTH DIVISION', 'SIXTH DIVISION', 'SEVENTH DIVISION', 'EIGHTH DIVISION')),
     citizen_ethnicity = factor(citizen_ethnicity, levels = c('White', 'Black', 'Hispanic', 'Other'))
   )
 
@@ -359,9 +366,9 @@ lmpd_representation_plt <- division_combined_demographics %>%
   ) + 
   geom_text(
     aes(
+      y = lmpd_relative_representation + 0.015 * sign(lmpd_relative_representation),
       label = scales::percent(lmpd_relative_representation, accuracy = 1)
     ),
-    vjust = 0,
     size = 3,
     colour = '#000000',
     family = 'Roboto Condensed'  
@@ -370,16 +377,16 @@ lmpd_representation_plt <- division_combined_demographics %>%
     division ~ ., nrow = 2
   ) +
   labs(
-    title = 'There is a big difference in racial representation in First and Second DIvisions',
-    subtitle = 'Difference in Share',
+    title = 'There is a big difference in racial representation in First and Second Divisions',
+    subtitle = 'Difference in Share of LMPD and Citizens',
     x = NULL,
     y = NULL
   )
 
 ## Save plot
 ggsave(
-  'outputs/reporting/lmpd_demographics_plt.png', 
-  lmpd_demographics_plt,
+  'outputs/reporting/lmpd_representation_plt.png', 
+  lmpd_representation_plt,
   height = 3.25, 
   width = 6.25, 
   units = 'in',
